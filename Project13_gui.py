@@ -95,6 +95,24 @@ class BlackjackApp(tk.Tk):
             pass
     
     def _flash_button(self, button, color1, color2):
+        """Internal method to toggle button colors."""
+        try:
+            if not button.winfo_exists() or not getattr(button, 'flash_active', False):
+                return
+                
+            current_color = button.cget("bg")
+            next_color = color2 if current_color == color1 else color1
+            
+            if MacButton and isinstance(button, MacButton):
+                button.configure(bg=next_color)
+            else:
+                button.config(bg=next_color)
+                
+            self.after(500, lambda: self._flash_button(button, color1, color2))
+        except Exception:
+            pass
+
+    def show_login(self):
         """Displays the login screen."""
         self.clear_container()
         
