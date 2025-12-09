@@ -46,7 +46,12 @@ class BlackjackApp(tk.Tk):
                            font=font, activebackground=bg, borderless=1, 
                            focuscolor="", highlightthickness=2, highlightbackground="black", **kwargs)
         else:
-            # Standard tkinter button with solid border
+            # Standard tkinter button fallback
+            # CRITICAL FIX: Standard buttons treat 'height' as text lines, not pixels.
+            # If height is passed (e.g. 50), it makes a huge button. We must remove it.
+            if 'height' in kwargs:
+                kwargs.pop('height') 
+                
             return tk.Button(parent, text=text, command=command, bg=bg, fg=fg, 
                            font=font, activebackground=bg, activeforeground=fg, 
                            relief="solid", bd=2, highlightbackground="black", highlightthickness=2, **kwargs)
@@ -90,32 +95,6 @@ class BlackjackApp(tk.Tk):
             pass
     
     def _flash_button(self, button, color1, color2):
-        """Internal method to toggle button colors."""
-        if not getattr(button, 'flash_active', False):
-            return
-        
-        # Check if button is disabled (if disabled, force stop)
-        if button.cget('state') == 'disabled':
-            button.flash_active = False
-            return
-
-        # Get current color and toggle
-        try:
-            current = button.cget('bg')
-            new_color = color2 if current == color1 else color1
-            
-            if MacButton and isinstance(button, MacButton):
-                button.configure(bg=new_color)
-            else:
-                button.config(bg=new_color)
-            
-            # Schedule next flash
-            self.after(500, lambda: self._flash_button(button, color1, color2))
-        except:
-            # Handle case where button destroyed
-            pass
-
-    def show_login(self):
         """Displays the login screen."""
         self.clear_container()
         
